@@ -31,8 +31,7 @@ for url in urls:
 # パーセンテージの高い順にソートして上位30件を表示
 data_sorted = sorted(data, key=lambda x: x['percentage'], reverse=True)
 for i in range(30):
-    #もし同じURLのものがあれば、一番パーセンテージが高いものだけを表示
-    if i == 0:
-        print(f"Rank {i+1}: {data_sorted[i]['percentage']} - {data_sorted[i]['url']}")
-    elif data_sorted[i]['url'] != data_sorted[i-1]['url']:
-#print(f"Rank {i+1}: {data_sorted[i]['percentage']} - {data_sorted[i]['url']}")
+    #もし30個の中に同じURLのものがあれば、被っているものの中から一番パーセンテージが高いものだけを表示。被りなしで30個を表示する。
+    if data_sorted[i]['url'] != data_sorted[i+1]['url']:
+        print(data_sorted[i])
+
