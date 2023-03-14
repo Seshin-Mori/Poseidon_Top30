@@ -32,10 +32,14 @@ for url in urls:
                 inner_td_text = inner_td.text
                 if odds is None and re.search('\d+\.\d+', inner_td_text):
                     odds = float(re.search('\d+\.\d+', inner_td_text).group())
-                #li要素から[hh:mm]を取得。td要素の外側にあるため、parentを使う
-                if time is None and re.search('\[\d+:\d+\]', inner_td.parent.text):
-                    time = re.search('\[\d+:\d+\]', inner_td.parent.text).group()
-            data.append({'percentage': percentage, 'odds': odds, 'time': time, 'url': url})
+
+#ページ全体のli要素から[hh:mm]を取得し、timeに代入。これはtext-centerクラスのtd要素の中にはないため、ページ全体のli要素から取得する必要がある。
+for li in soup.find_all('li'):
+    li_text = li.text
+    if re.search('\[\d+:\d+\]', li_text):
+        time = re.search('\[\d+:\d+\]', li_text).group().replace('[', '').replace(']', '')
+        break
+    data.append({'percentage': percentage, 'odds': odds, 'time': time, 'url': url})
 
 data_sorted = sorted([d for d in data if d['percentage'] >= 50], key=lambda x: x['percentage'], reverse=True)
 for d in data_sorted[:30]:
