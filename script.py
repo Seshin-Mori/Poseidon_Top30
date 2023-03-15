@@ -32,17 +32,19 @@ for url in urls:
             percentage = float(re.search('\d+\.\d+%', td_text).group()[:-1])
             item = {'url': url, 'percentage': percentage}
             data.append(item)
-
-        elif re.search('\d+\.\d+', td_text):
-            odds = float(re.search('\d+\.\d+', td_text).group())
+        #取得したパーセンテージと同じtrの中にオッズがあるので、そのオッズを取得する。X.Xの形式
+        #取得したオッズの数値の中から、最も小さい数値を取得する。class="text-center"のtdの中にオッズがあるので、その中から1.0以上かつ最も小さい数値を取得する。
+        if re.search('\d\.\d', td_text):
+            odds = float(re.search('\d\.\d', td_text).group())
             for d in data:
                 if d['url'] == url:
-                    d['odds'] = odds
-
-        elif td_text == '---':
-            for d in data:
-                if d['url'] == url:
-                    d['odds'] = td_text
+                    if d['percentage'] == percentage:
+                        if odds >= 1.0:
+                            if 'odds' not in d:
+                                d['odds'] = odds
+                            elif d['odds'] > odds:
+                                d['odds'] = odds
+        
 # [hh:mm]の時間を取得する。
     li_elements = soup.find_all('li')
     for li in li_elements:
