@@ -50,15 +50,16 @@ for url in urls:
             else:
                 item['pt'] = '---'
 
-# [hh:mm]の時間を取得する。
+    # 「電投締切[hh:mm]」の時間を取得する。
     li_elements = soup.find_all('li')
     for li in li_elements:
         li_text = li.text
-        if re.search('\[\d+:\d+\]', li_text):
-            time = re.search('\[\d+:\d+\]', li_text).group()
+        if re.search('電投締切\[\d+:\d+\]', li_text):
+            time = re.search('電投締切\[\d+:\d+\]', li_text).group()
             for d in data:
                 if d['url'] == url:
                     d['time'] = time
+
 
 # Sort and print
 #data = sorted(filter(lambda x: x['percentage'] >= 50, data), key=lambda x: x['percentage'], reverse=True)
@@ -70,11 +71,12 @@ data = sorted(data, key=lambda x: x['time'])
 for d in data:
     if d['percentage'] >= 50:
         # オッズが2.0以上の場合は赤字で表示する
-        if d['odds'] >= 2.0:
+        if isinstance(d['odds'], float) and d['odds'] >= 2.0:
             print(f"\033[31m{d['percentage']}% {d['time']} {d['url']} {d['odds']} {d['pt']}\033[0m")
         # オッズが2.0未満の場合は通常の色で表示する
         else:
             print(f"{d['percentage']}% {d['time']} {d['url']} {d['odds']} {d['pt']}")
+
 
 
 
