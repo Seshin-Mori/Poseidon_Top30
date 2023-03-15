@@ -59,13 +59,16 @@ for url in urls:
 data = sorted(data, key=lambda x: x['time'])
 
 #フォーマットを見やすくするために、リストの中身を整形して要素を区切り表のようにする。オッズが2.0以上の場合は、赤字で表示する。
+#percentageが50%以上の場合のみ表示する。
 for d in data:
-    if d['odds'] == '---':
-        d['odds'] = '---'
-    elif d['odds'] >= 2.0:
-        d['odds'] = f"\033[31m{d['odds']}\033[0m"
-    else:
-        d['odds'] = f"{d['odds']}"
-    print(f"{d['url']} {d['percentage']}% {d['odds']} {d['time']}")
+    if d['percentage'] >= 50:
+        if d['odds'] == '---':
+            print(f"{d['time']} {d['url']} {d['percentage']}%")
+        elif d['odds'] >= 2.0:
+            print(f"{d['time']} {d['url']} {d['percentage']}% \033[31m{d['odds']}\033[0m")
+        else:
+            print(f"{d['time']} {d['url']} {d['percentage']}% {d['odds']}")
+
+            
 
 
