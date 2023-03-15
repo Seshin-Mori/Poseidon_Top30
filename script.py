@@ -24,26 +24,23 @@ data = []
 for url in urls:
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
-    td_elements = soup.find_all('td', {'class': 'text-center'})
+    tr_elements = soup.find_all('tr')
 
-    for td in td_elements:
-        td_text = td.text
-        if re.search('\d+\.\d+%', td_text):
-            percentage = float(re.search('\d+\.\d+%', td_text).group()[:-1])
+    for tr in tr_elements:
+        percentage_td = tr.find('td', {'class': 'text-center'}, text=re.compile('\d+\.\d+%'))
+        if percentage_td:
+            percentage = float(percentage_td.text[:-1])
             item = {'url': url, 'percentage': percentage}
             data.append(item)
-        #取得したパーセンテージと同じtrの中にオッズがあるので、そのオッズを取得する。X.Xの形式
-        #取得したオッズの数値の中から、最も小さい数値を取得する。class="text-center"のtdの中にオッズがあるので、その中から1.0以上かつ最も小さい数値を取得する。
-        if re.search('\d\.\d', td_text):
-            odds = float(re.search('\d\.\d', td_text).group())
-            for d in data:
-                if d['url'] == url:
-                    if d['percentage'] == percentage:
-                        if odds >= 1.0:
-                            if 'odds' not in d:
-                                d['odds'] = odds
-                            elif d['odds'] > odds:
-                                d['odds'] = odds
+
+            odds_td = tr.find('td', {'class': 'text-center'}, text=re.compile('^\d\.\d$'))
+            if odds_td:
+                odds = float(odds_td.text)
+                if odds >= 1.0:
+                    item['odds'] = odds
+            else:
+                item['odds'] = '---'
+
         
 # [hh:mm]の時間を取得する。
     li_elements = soup.find_all('li')
@@ -69,8 +66,6 @@ for d in data:
         elif d['odds'] >= 2.0:
             print(f"{d['time']} {d['url']} {d['percentage']}% \033[31m{d['odds']}\033[0m")
         else:
-            print(f"{d['time']} {d['url']} {d['percentage']}% {d['odds']}")
-
-            
+            print(f"{d['time']} {d['url']} {d['percentage']}% {d['odds']}")  
 
 
