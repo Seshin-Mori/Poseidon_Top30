@@ -40,8 +40,16 @@ for url in urls:
                     item['odds'] = odds
             else:
                 item['odds'] = '---'
+            
+            #指数の表示XX.XXptまたはXXX.XXptを取得する。ptに格納する。
+            pt_td = tr.find('td', {'class': 'text-center'}, text=re.compile('^\d{2,3}\.\d{2}pt$'))
+            if pt_td:
+                pt = float(pt_td.text[:-2])
+                if pt >= 1.0:
+                    item['pt'] = pt
+            else:
+                item['pt'] = '---'
 
-        
 # [hh:mm]の時間を取得する。
     li_elements = soup.find_all('li')
     for li in li_elements:
@@ -57,15 +65,16 @@ for url in urls:
 #[hh:mm]の時間が早い順に配列をソートする。
 data = sorted(data, key=lambda x: x['time'])
 
-#フォーマットを見やすくするために、リストの中身を整形して要素を区切り表のようにする。オッズが2.0以上の場合は、赤字で表示する。
-#percentageが50%以上の場合のみ表示する。
+# フォーマットを見やすくするために、リストの中身を整形して要素を区切り表のようにする。オッズが2.0以上の場合は、赤字で表示する。
+# percentageが50%以上の場合のみ表示する。
 for d in data:
     if d['percentage'] >= 50:
-        if d['odds'] == '---':
-            print(f"{d['time']} {d['url']} {d['percentage']}%")
-        elif d['odds'] >= 2.0:
-            print(f"{d['time']} {d['url']} {d['percentage']}% \033[31m{d['odds']}\033[0m")
+        # オッズが2.0以上の場合は赤字で表示する
+        if d['odds'] >= 2.0:
+            print(f"\033[31m{d['percentage']}% {d['time']} {d['url']} {d['odds']} {d['pt']}\033[0m")
+        # オッズが2.0未満の場合は通常の色で表示する
         else:
-            print(f"{d['time']} {d['url']} {d['percentage']}% {d['odds']}")  
+            print(f"{d['percentage']}% {d['time']} {d['url']} {d['odds']} {d['pt']}")
+
 
 
