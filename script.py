@@ -60,8 +60,6 @@ for url in urls:
                 if d['url'] == url:
                     d['time'] = time
 
-
-# Sort and print
 #data = sorted(filter(lambda x: x['percentage'] >= 50, data), key=lambda x: x['percentage'], reverse=True)
 #[hh:mm]の時間が早い順に配列をソートする。
 data = sorted(data, key=lambda x: x['time'])
@@ -71,7 +69,7 @@ data = sorted(data, key=lambda x: x['time'])
 for d in data:
     if d['percentage'] >= 50:
         # オッズが2.0以上の場合は赤字で表示する
-        if isinstance(d['odds'], float) and d['odds'] >= 2.0:
+        if 'odds' in d and isinstance(d['odds'], float) and d['odds'] >= 2.0:
             print(f"\033[31m{d['percentage']}% {d['time']} {d['url']} {d['odds']} {d['pt']}\033[0m")
         # オッズが2.0未満の場合は通常の色で表示する
         else:
